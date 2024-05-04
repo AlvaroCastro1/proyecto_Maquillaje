@@ -1,100 +1,149 @@
 import cv2
 import time
-import datetime
 import numpy as np
 
-# porcentaje del tamanio (10%, 20,%)
-tamanio_rostro = 0.05
-# Cronómetro para la captura
-capture_timer = None
-capture_duration = 3  # Duración de la cuenta regresiva en segundos
-captured_frame = None
+from clasificador.clasificador import clasificar_rostro
+# porcentaje del tamaño del rostro (10%, 20%, ...)
+proporcion_tamano_rostro = 0.05
 
-# Clasificador para detección de rostros
-face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+# error permitido para el centro de captura (del total del video)
+error_permitido = 0.20
 
-# garantizar buena calidad de la imagen inicial
-def is_buena_imagen(x, y, w, h, ancho_frame, frame_ancho):
-    area_del_rostro = w * h
-    frame_area = ancho_frame * frame_ancho
+# cuenta regresiva en segundos
+duracion_captura = 3
+# temporizador para la captura
+temporizador_captura = None
+imagen_capturada = None
+
+# Cargar el clasificador de Haar para detección de rostros
+clasificador_rostros = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+
+def simular_flash():
+    # simular el flash antes de la captura en la misma ventana
+    cuadro_blanco = np.ones_like(cuadro) * 255
+    cv2.imshow("flash", cuadro_blanco)
+    cv2.waitKey(250)  # mantener por 250ms
+
+def es_buena_captura(x, y, ancho, alto, ancho_frame, alto_frame):
+    # area rostro
+    area_rostro = ancho * alto
+    #area total    
+    area_frame = ancho_frame * alto_frame
     
-    # Determina si el rostro es suficientemente grande y centrado
-    if area_del_rostro / frame_area >= tamanio_rostro:
-        frame_centro_x = ancho_frame // 2
-        frame_centro_y = frame_ancho // 2
-        face_centro_x = x + w // 2
-        face_centro_y = y + h // 2
+    # validacion del tamaño del rostro
+    if area_rostro / area_frame >= proporcion_tamano_rostro:
+        # centro del frame
+        centro_frame_x = ancho_frame // 2
+        centro_frame_y = alto_frame // 2
         
-        if abs(frame_centro_x - face_centro_x) <= 0.2 * ancho_frame and abs(frame_centro_y - face_centro_y) <= 0.2 * ancho_frame:
+        # centro del rostro
+        centro_rostro_x = x + ancho // 2
+        centro_rostro_y = y + alto // 2
+        
+        # si el centro del rostro esta CERCA del centro del cuadro
+        if abs(centro_frame_x - centro_rostro_x) <= error_permitido * ancho_frame and abs(centro_frame_y - centro_rostro_y) <= error_permitido * alto_frame:
+            """
+            la captura del rostro es "buena" considerenado:
+                es de buen tamaño
+                que esta centrado 
+            """
             return True
-    
+    # rostro no cumple con los requisitos
     return False
 
 # Captura de video desde la webcam
-cap = cv2.VideoCapture(0)
+camara = cv2.VideoCapture(0)
 
-# Bucle de captura de imagen
 while True:
-    ret, frame = cap.read()
+    # Leer un frame a frame de la camara
+    ret, cuadro = camara.read()
+    if not ret:
+        break  # Salir del bucle si no se puede leer
     
-    frame_height, frame_width, _ = frame.shape
-    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)  # Conversión a escala de grises
-    faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
+    alto_frame, ancho_frame, _ = cuadro.shape
+    cuadro_gris = cv2.cvtColor(cuadro, cv2.COLOR_BGR2GRAY)
     
-    message = "Esperando buen rostro..."  # Mensaje predeterminado
+    # mantener cuadro original para despues guardar
+    cuadro_original = cuadro.copy()
+    # Detectar rostros en el cuadro
+    rostros = clasificador_rostros.detectMultiScale(cuadro_gris, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
     
-    for (x, y, w, h) in faces:
-        cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)  # Dibuja el rectángulo
+    mensaje = "Esperando buen rostro..."
+    
+    # Dibujar el ovalo de referencia para que se coloque el rostro
+    centro = (ancho_frame // 2, alto_frame // 2)
+    # Tamaño del óvalo
+    ejes = (ancho_frame // 5, alto_frame // 3)
+    # Ángulo del óvalo
+    angulo = 0
+    inicio_angulo = 0
+    fin_angulo = 360
+    color = (255, 0, 0)
+    grosor = 2
+    #cv2.ellipse(imagen2colocar, centro, tuplaEjer, angulo, inicio_angulo, fin_angulo, color, grosor)
+    cv2.ellipse(cuadro, centro, ejes, angulo, inicio_angulo, fin_angulo, color, grosor)
+    
+    for (x, y, ancho, alto) in rostros:
+        # Dibujar un rectángulo alrededor del rostro detectado
+        cv2.rectangle(cuadro, (x, y), (x + ancho, y + alto), (0, 255, 0), 2)
         
-        if is_buena_imagen(x, y, w, h, frame_width, frame_height):
-            message = "Buen rostro detectado!"
-            if capture_timer is None:
-                # Inicia el cronómetro cuando se detecta un buen rostro
-                capture_timer = time.time()
-            elif time.time() - capture_timer >= capture_duration:
-                captured_frame = frame.copy()  # Captura la imagen
-                break  # Sale del bucle interno
+        # Verificar si el rostro es "bueno"
+        if es_buena_captura(x, y, ancho, alto, ancho_frame, alto_frame):
+            mensaje = "Buen rostro detectado!"
+            if temporizador_captura is None:
+                # comienza el temporizador si se es un buen rostro
+                temporizador_captura = time.time()
+            elif time.time() - temporizador_captura >= duracion_captura:
+                # Si el temporizador ha expirado, guardar la imagen y salir de la captura de video
+                simular_flash()
+                imagen_capturada = cuadro.copy()
+                break 
         else:
-            # Reinicia el cronómetro si el rostro ya no es bueno
-            capture_timer = None
+            # Si la captura cambia y/o no es bueno, reiniciar el temporizador
+            temporizador_captura = None
 
-    # Mostrar el tiempo restante en la cuenta regresiva
-    if capture_timer is not None:
-        time_remaining = capture_duration - (time.time() - capture_timer)
-        if time_remaining > 0:
-            message += f" - Captura en {int(time_remaining)} segundos"
+    # mostrar el tiempo restante de la cuenta regresiva, solo si esta en progreso
+    if temporizador_captura is not None:
+        tiempo_restante = duracion_captura - (time.time() - temporizador_captura)
+        if tiempo_restante > 0:
+            mensaje += f" - Captura en {int(tiempo_restante)} segundos"
         else:
-            message += " - ¡Captura ahora!"
+            mensaje += " - ¡Sonrie!"
+            cuadro = np.ones_like(cuadro)*255
+
 
     # Mostrar el mensaje y el video en tiempo real
-    cv2.putText(frame, message, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-    cv2.imshow('Deteccion de Rostros', frame)
+    cv2.putText(cuadro, mensaje, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+    cv2.imshow('Deteccion de Rostros', cuadro)
 
-    # Si se ha capturado una imagen, cerrar la ventana principal y mostrar la imagen en una nueva ventana
-    if captured_frame is not None:
-        # Cerrar la ventana principal
-        cap.release()
+    # Si se ha capturado una imagen, detener la captura y mostrar la imagen capturada
+    if imagen_capturada is not None:
+        # Detener la captura de video
+        camara.release()
         cv2.destroyAllWindows()
-
+        
         # Mostrar la imagen capturada en una nueva ventana
-        cv2.imshow("Imagen Capturada", captured_frame)
-
-        # Permitir que el usuario decida si quiere volver a capturar
+        cv2.imshow("Imagen Capturada", cuadro_original)
+        rostro_clasificado = clasificar_rostro(cuadro_original)
+        cv2.imshow("Figura", rostro_clasificado)
+        
+        # Preguntar al usuario si quiere volver a capturar
         while True:
-            key = cv2.waitKey(0) & 0xFF
-            if key == ord('r'):  # Volver a capturar
-                # Reiniciar el cronómetro y el bucle
-                capture_timer = None
-                captured_frame = None  # Eliminar la captura anterior
-                cap = cv2.VideoCapture(0)  # Reabrir la webcam
+            tecla = cv2.waitKey(0) & 0xFF
+            if tecla == ord('r'):  # Reintentar captura
+                # Reiniciar el temporizador y el bucle
+                temporizador_captura = None
+                imagen_capturada = None  # Limpiar la imagen capturada
+                camara = cv2.VideoCapture(0)  # Reabrir la webcam
                 break
-            elif key == ord('q'):  # Salir
+            elif tecla == ord('q'):  # Salir
                 cv2.destroyAllWindows()
-                exit()
-
-    # Salir del bucle si se presiona 'q'
+                exit()  # Terminar el programa
+    
+    # Si se presiona 'q', salir del bucle principal
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
-cap.release()
+# Liberar recursos y cerrar ventanas
+camara.release()
 cv2.destroyAllWindows()

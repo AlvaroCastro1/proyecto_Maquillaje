@@ -4,7 +4,7 @@ import dlib # deteccion de puntos de referencia faciales
 from sklearn.cluster import KMeans
 
 
-ruta_imagen = "./rostros/rostro2.png"
+ruta_imagen = "./rostros/rostro4.jpg"
 
 # detección de rostros
 modelo_deteccion_rostros = "./modelos/haarcascade_frontalface_default.xml"
@@ -20,6 +20,7 @@ predictor_puntos_faciales = dlib.shape_predictor(predictor_puntos_de_referencia)
 
 
 image = cv2.imread(ruta_imagen)
+print(image.shape)
 
 image = cv2.resize(image, (500, 500)) 
 
