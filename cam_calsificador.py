@@ -2,7 +2,8 @@ import cv2
 import time
 import numpy as np
 
-from clasificador.clasificador import clasificar_rostro
+# from clasificador.clasificador import clasificar_rostro
+
 # porcentaje del tamaño del rostro (10%, 20%, ...)
 proporcion_tamano_rostro = 0.05
 
@@ -124,8 +125,8 @@ while True:
         
         # Mostrar la imagen capturada en una nueva ventana
         cv2.imshow("Imagen Capturada", cuadro_original)
-        rostro_clasificado = clasificar_rostro(cuadro_original)
-        cv2.imshow("Figura", rostro_clasificado)
+        # rostro_clasificado = clasificar_rostro(cuadro_original)
+        # cv2.imshow("Figura", rostro_clasificado)
         
         # Preguntar al usuario si quiere volver a capturar
         while True:
