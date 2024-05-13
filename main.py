@@ -123,6 +123,7 @@ class VideoCaptureApp(QtWidgets.QMainWindow):
 
         if self.imagen_capturada is not None:
             cv2.imshow("a_enviar", a_enviar)
+            cv2.imwrite("./imagen.png", a_enviar)
             color = obtener_color_dominante(a_enviar)
             cv2.imshow("color", color)
 
