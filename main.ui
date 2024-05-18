@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>833</width>
-    <height>502</height>
+    <width>1012</width>
+    <height>561</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -49,12 +49,22 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>831</width>
-         <height>501</height>
+         <width>1101</width>
+         <height>571</height>
         </rect>
        </property>
        <property name="styleSheet">
-        <string notr="true">background-color: rgb(171, 187, 159);</string>
+        <string notr="true">
+QWidget {
+    background: qlineargradient(
+        x1: 0, y1: 0, 
+        x2: 1, y2: 1, 
+		stop: 0		 #7FFFD4,    /* Amarillo*/
+        stop: 0.5	 #FF6F61, 	/* Coral */
+        stop: 1		 #FF69B4   	/* Rosa Suave */
+    );
+}
+</string>
        </property>
        <property name="frameShape">
         <enum>QFrame::StyledPanel</enum>
@@ -67,12 +77,16 @@
          <rect>
           <x>20</x>
           <y>20</y>
-          <width>791</width>
-          <height>431</height>
+          <width>751</width>
+          <height>471</height>
          </rect>
         </property>
         <property name="styleSheet">
-         <string notr="true">background-color: rgb(230, 235, 169);</string>
+         <string notr="true">QWidget {
+    background-color: rgba(255, 255, 255, 0);  /* Blanco transparente */
+	border: 1px solid black;
+}
+</string>
         </property>
         <property name="text">
          <string>imagen 1</string>
@@ -85,16 +99,62 @@
         <property name="geometry">
          <rect>
           <x>20</x>
-          <y>460</y>
-          <width>791</width>
-          <height>24</height>
+          <y>500</y>
+          <width>751</width>
+          <height>31</height>
          </rect>
         </property>
         <property name="styleSheet">
-         <string notr="true">background-color: rgb(111, 139, 148)</string>
+         <string notr="true">QPushButton {
+    background-color: #FF69B4;          /* Color de fondo rosa chicle */
+    border: 2px solid #FF1493;          /* Borde sólido color rosa oscuro */
+    padding: 6px 20px;                  /* Espaciado interno */
+    font-size: 12px;                    /* Tamaño de fuente */
+    border-radius: 5px;                 /* Bordes iniciales ligeramente redondeados */
+}
+
+QPushButton:hover {
+    background-color: #FF1493;          /* Color de fondo al pasar el cursor */
+    border: 2px solid #FF69B4;          /* Borde al pasar el cursor */
+    border-radius: 15px;                /* Bordes redondeados al pasar el cursor */
+}
+
+QPushButton:pressed {
+    background-color: #FF69B4;          /* Color de fondo al hacer clic */
+    border: 2px solid #FF1493;          /* Borde al hacer clic */
+    padding-left: 15px;                 /* Desplazamiento al hacer clic */
+    padding-top: 15px;                  /* Desplazamiento al hacer clic */
+}
+</string>
         </property>
         <property name="text">
          <string>Salir</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label">
+        <property name="geometry">
+         <rect>
+          <x>800</x>
+          <y>30</y>
+          <width>181</width>
+          <height>171</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QWidget {
+    background-color: rgba(255, 255, 255, 0);  /* Blanco transparente */
+	border: 1px solid black;
+}
+</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="pixmap">
+         <pixmap>recursos/leyenda.png</pixmap>
+        </property>
+        <property name="scaledContents">
+         <bool>true</bool>
         </property>
        </widget>
       </widget>
