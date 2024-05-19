@@ -112,14 +112,16 @@ class VideoCaptureApp(QtWidgets.QMainWindow):
                     self.lb_color_piel.setPixmap(pixmap)
 
                     # obtener forma y mostrarlo en una de las etiquetas
-                    clasif1,forma = c1(cuadro_capturado)
-                    self.lb_forma.setText(f"forma: {forma}")
-                    cv2.imshow("c", clasif1)
-                    cv2.imshow("color", color)
-                    cv2.waitKey()
-                    cv2.destroyAllWindows()
+                    clasif1,forma1 = c1(cuadro_capturado)
+                    clasif2,forma2 = c2(cuadro_capturado)
+                    self.lb_forma.setText(f"formas: \n{forma1}\n{forma2}")
+                    # cv2.imshow("c", clasif1)
+                    # cv2.imshow("color", color)
+                    # cv2.waitKey()
+                    # cv2.destroyAllWindows()
+
                     # Configurar fuente y tamaño
-                    fuente = QFont('Arial', 16)
+                    fuente = QFont('Arial', 12)
                     self.lb_forma.setFont(fuente)
 
             # Añadir texto con mensaje

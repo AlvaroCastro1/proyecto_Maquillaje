@@ -76,12 +76,13 @@ def clasificar(imagen):
         # Anotar la forma del rostro
         cv2.putText(imagen, f"Forma: {forma_rostro}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
     
-    return imagen
+    return imagen, forma_rostro
 
 # Ejemplo de uso de la función
 if __name__ == "__main__":
     imagen = cv2.imread("./rostros/rostro4.jpg")
-    imagen_anotada = clasificar(imagen)
+    imagen_anotada, forma = clasificar(imagen)
+    print(forma)
     cv2.imshow("Rostro Anotado", imagen_anotada)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
