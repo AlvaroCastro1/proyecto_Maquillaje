@@ -104,9 +104,10 @@ class VideoCaptureApp(QtWidgets.QMainWindow):
                     
                     # obtener color y mostrarlo en una de las etiquetas
                     color = obtener_color_dominante(cuadro_capturado)
-                    altura, ancho, canales = color.shape
+                    color1 = cv2.cvtColor(color, cv2.COLOR_BGR2RGB)
+                    altura, ancho, canales = color1.shape
                     bytes_per_line = 3 * ancho
-                    q_image = QImage(color.data, ancho, altura, bytes_per_line, QImage.Format.Format_RGB888)
+                    q_image = QImage(color1.data, ancho, altura, bytes_per_line, QImage.Format.Format_RGB888)
                     pixmap = QPixmap.fromImage(q_image)
                     self.lb_color_piel.setPixmap(pixmap)
 
@@ -114,6 +115,7 @@ class VideoCaptureApp(QtWidgets.QMainWindow):
                     clasif1,forma = c1(cuadro_capturado)
                     self.lb_forma.setText(f"forma: {forma}")
                     cv2.imshow("c", clasif1)
+                    cv2.imshow("color", color)
                     cv2.waitKey()
                     cv2.destroyAllWindows()
                     # Configurar fuente y tamaño
