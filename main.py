@@ -4,6 +4,8 @@ import time
 import numpy as np
 from PyQt6 import QtWidgets, QtGui, QtCore, uic
 from PyQt6.QtGui import QPixmap, QImage, QFont
+from PyQt6.QtGui import QKeyEvent
+from PyQt6.QtCore import Qt
 
 from clasificacion_por_rostro2 import clasificar as c2
 from clasificacion_por_rostro import clasificar as c1
@@ -43,8 +45,15 @@ class VideoCaptureApp(QtWidgets.QMainWindow):
         self.mensaje = "Esperando buen rostro..."
         self.continuar_clasifiacion=True
 
-    def update_frame(self):
+    def keyPressEvent(self, event: QKeyEvent):
+        if event.key() == Qt.Key.Key_R:
+            self.continuar_clasifiacion=True
+            self.temporizador_captura = None
+        else:
+            super().keyPressEvent(event)
 
+
+    def update_frame(self):
         ret, cuadro = self.cap.read()
         if not ret:
             return
