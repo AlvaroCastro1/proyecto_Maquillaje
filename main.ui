@@ -131,7 +131,7 @@ QPushButton:pressed {
          <string>Salir</string>
         </property>
        </widget>
-       <widget class="QLabel" name="label">
+       <widget class="QLabel" name="lb_leyenda">
         <property name="geometry">
          <rect>
           <x>800</x>
@@ -155,6 +155,61 @@ QPushButton:pressed {
         </property>
         <property name="scaledContents">
          <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QLabel" name="lb_color_piel">
+        <property name="geometry">
+         <rect>
+          <x>800</x>
+          <y>250</y>
+          <width>181</width>
+          <height>81</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QWidget {
+    background-color: rgba(255, 255, 255, 0);  /* Blanco transparente */
+	border: 1px solid black;
+}
+</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="scaledContents">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QLabel" name="lb_txt_color">
+        <property name="geometry">
+         <rect>
+          <x>800</x>
+          <y>220</y>
+          <width>181</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">    background-color: rgba(255, 255, 255, 0);  /* Blanco transparente */</string>
+        </property>
+        <property name="text">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Color de Piel&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="lb_forma">
+        <property name="geometry">
+         <rect>
+          <x>800</x>
+          <y>340</y>
+          <width>181</width>
+          <height>51</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">    background-color: rgba(255, 255, 255, 0);  /* Blanco transparente */</string>
+        </property>
+        <property name="text">
+         <string/>
         </property>
        </widget>
       </widget>

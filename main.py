@@ -3,6 +3,7 @@ import cv2
 import time
 import numpy as np
 from PyQt6 import QtWidgets, QtGui, QtCore, uic
+from PyQt6.QtGui import QPixmap, QImage, QFont
 
 from clasificacion_por_rostro2 import clasificar as c2
 from clasificacion_por_rostro import clasificar as c1
@@ -23,7 +24,11 @@ class VideoCaptureApp(QtWidgets.QMainWindow):
 
         # Obteniendo el QLabel y el botón para salir
         self.lb_camara = self.findChild(QtWidgets.QLabel, "lb_camara")
+        self.lb_color_piel = self.findChild(QtWidgets.QLabel, "lb_color_piel")
+        self.lb_forma = self.findChild(QtWidgets.QLabel, "lb_forma")
         self.btn_salir = self.findChild(QtWidgets.QPushButton, "btn_salir")
+        
+        # Configurar botones
         self.btn_salir.clicked.connect(self.close_application)
 
         # Configurar temporizador para actualizar video
@@ -36,73 +41,83 @@ class VideoCaptureApp(QtWidgets.QMainWindow):
         self.temporizador_captura = None
         self.imagen_capturada = None
         self.mensaje = "Esperando buen rostro..."
+        self.continuar_clasifiacion=True
 
     def update_frame(self):
+
         ret, cuadro = self.cap.read()
         if not ret:
             return
-        a_enviar = cuadro.copy()
         # IMPORTANTE pasar a RGB 
         cuadro = cv2.cvtColor(cuadro, cv2.COLOR_BGR2RGB)
+        cuadro = cv2.flip(cuadro, 1)
+        cuadro_capturado = cuadro.copy()
+        cuadro_capturado = cv2.cvtColor(cuadro_capturado, cv2.COLOR_BGR2RGB)        
 
-        # Convertir a escala de grises y detectar rostros
-        cuadro_gris = cv2.cvtColor(cuadro, cv2.COLOR_BGR2GRAY)
-        rostros = clasificador_rostros.detectMultiScale(
-            cuadro_gris, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30)
-        )
+        if self.continuar_clasifiacion:
+            # print("haciendo clasificacion")
+            # Convertir a escala de grises y detectar rostros
+            cuadro_gris = cv2.cvtColor(cuadro, cv2.COLOR_BGR2GRAY)
+            rostros = clasificador_rostros.detectMultiScale(
+                cuadro_gris, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30)
+            )
 
+            alto_frame, ancho_frame, _ = cuadro.shape
+            # Centro y ejes del óvalo
+            centro = (ancho_frame // 2, alto_frame // 2)
+            eje_x = ancho_frame // 6
+            eje_y = alto_frame // 3
+
+            # Dibujar el óvalo en el centro del cuadro
+            cv2.ellipse(cuadro,centro,(eje_x, eje_y),0,0,360,(255, 0, 0),2)
+
+            # Verificar si el rostro es una "buena captura"
+            for (x, y, ancho, alto) in rostros:
+                cv2.rectangle(cuadro, (x, y), (x + ancho, y + alto), (0, 255, 0), 2)
+                if self.es_buena_captura(x, y, ancho, alto, ancho_frame, alto_frame):
+                    self.mensaje = "Buen rostro detectado!"
+                    if self.temporizador_captura is None:
+                        self.temporizador_captura = time.time()
+                    elif time.time() - self.temporizador_captura >= duracion_captura:
+                        self.imagen_capturada = cuadro.copy()
+                        break
+                else:
+                    self.temporizador_captura = None
+
+            # Actualizar mensaje con temporizador
+            if self.temporizador_captura is not None:
+                tiempo_restante = duracion_captura - (time.time() - self.temporizador_captura)
+                if tiempo_restante > 0:
+                    self.mensaje += f" - Captura en {int(tiempo_restante)} segundos"
+                else:
+                    self.mensaje = "Sonrie!"
+                    self.continuar_clasifiacion = False
+                    
+                    # obtener color y mostrarlo en una de las etiquetas
+                    color = obtener_color_dominante(cuadro_capturado)
+                    altura, ancho, canales = color.shape
+                    bytes_per_line = 3 * ancho
+                    q_image = QImage(color.data, ancho, altura, bytes_per_line, QImage.Format.Format_RGB888)
+                    pixmap = QPixmap.fromImage(q_image)
+                    self.lb_color_piel.setPixmap(pixmap)
+
+                    # obtener forma y mostrarlo en una de las etiquetas
+                    clasif1,forma = c1(cuadro_capturado)
+                    self.lb_forma.setText(f"forma: {forma}")
+                    cv2.imshow("c", clasif1)
+                    cv2.waitKey()
+                    cv2.destroyAllWindows()
+                    # Configurar fuente y tamaño
+                    fuente = QFont('Arial', 16)
+                    self.lb_forma.setFont(fuente)
+
+            # Añadir texto con mensaje
+            cv2.putText(cuadro,self.mensaje,(10, 30),cv2.FONT_HERSHEY_SIMPLEX,1,(255, 0, 0),2)
+
+        else:
+            # print("ya se acabo la clasificacion")
+            pass
         
-        alto_frame, ancho_frame, _ = cuadro.shape
-        # Centro y ejes del óvalo
-        centro = (ancho_frame // 2, alto_frame // 2)
-        eje_x = ancho_frame // 6
-        eje_y = alto_frame // 3
-
-        # Dibujar el óvalo en el centro del cuadro
-        cv2.ellipse(
-            cuadro,
-            centro,
-            (eje_x, eje_y),
-            0,
-            0,
-            360,
-            (255, 0, 0),
-            2,
-        )
-
-        # Verificar si el rostro es una "buena captura"
-        for (x, y, ancho, alto) in rostros:
-            cv2.rectangle(cuadro, (x, y), (x + ancho, y + alto), (0, 255, 0), 2)
-            if self.es_buena_captura(x, y, ancho, alto, ancho_frame, alto_frame):
-                self.mensaje = "Buen rostro detectado!"
-                if self.temporizador_captura is None:
-                    self.temporizador_captura = time.time()
-                elif time.time() - self.temporizador_captura >= duracion_captura:
-                    self.simular_flash(cuadro)
-                    self.imagen_capturada = cuadro.copy()
-                    break
-            else:
-                self.temporizador_captura = None
-
-        # Actualizar mensaje con temporizador
-        if self.temporizador_captura is not None:
-            tiempo_restante = duracion_captura - (time.time() - self.temporizador_captura)
-            if tiempo_restante > 0:
-                self.mensaje += f" - Captura en {int(tiempo_restante)} segundos"
-            else:
-                self.mensaje = "Sonrie!"
-
-        # Añadir texto con mensaje
-        cv2.putText(
-            cuadro,
-            self.mensaje,
-            (10, 30),
-            cv2.FONT_HERSHEY_SIMPLEX,
-            1,
-            (0, 255, 0),
-            2,
-        )
-
         # Convertir a formato Qt para mostrar en PyQt6
         h, w, ch = cuadro.shape
         bytes_per_line = ch * w
@@ -117,24 +132,7 @@ class VideoCaptureApp(QtWidgets.QMainWindow):
             QtCore.Qt.AspectRatioMode.IgnoreAspectRatio,
             QtCore.Qt.TransformationMode.SmoothTransformation,
         )
-
-
         self.lb_camara.setPixmap(scaled_pixmap)
-
-        if self.imagen_capturada is not None:
-            cv2.imshow("a_enviar", a_enviar)
-            cv2.imwrite("./imagen.png", a_enviar)
-            color = obtener_color_dominante(a_enviar)
-            cv2.imshow("color", color)
-
-            clasif1 = c1(a_enviar)
-            clasif2 = c2(a_enviar)
-            cv2.imshow("Clasif1", clasif1)
-            cv2.imshow("Clasif2", clasif2)
-            cv2.waitKey()
-            cv2.destroyAllWindows()
-            self.detener_temporizador_y_mostrar_imagen()
-
 
     def es_buena_captura(self, x, y, ancho, alto, ancho_frame, alto_frame):
         area_rostro = ancho * alto
@@ -150,32 +148,6 @@ class VideoCaptureApp(QtWidgets.QMainWindow):
             ):
                 return True
         return False
-
-    def simular_flash(self, cuadro):
-        cuadro_blanco = np.ones_like(cuadro) * 255
-        self.lb_camara.setPixmap(
-            QtGui.QPixmap.fromImage(
-                QtGui.QImage(
-                    cuadro_blanco.data,
-                    cuadro_blanco.shape[1],
-                    cuadro_blanco.shape[0],
-                    cuadro_blanco.shape[1] * cuadro_blanco.shape[2],
-                    QtGui.QImage.Format.Format_RGB888,
-                )
-            ).scaled(
-                self.lb_camara.size(),
-                QtCore.Qt.AspectRatioMode.IgnoreAspectRatio,
-                QtCore.Qt.TransformationMode.SmoothTransformation,
-            )
-        )
-        time.sleep(0.25)
-
-    def detener_temporizador_y_mostrar_imagen(self):
-        self.timer.stop()
-        self.cap.release()
-        # Debería mostrar la imagen capturada aquí
-        # Puedes abrir una nueva ventana o mostrarla en otro QLabel
-        # Si quieres reiniciar, implementa la lógica para reiniciar la captura
         
     def close_application(self):
         self.close()

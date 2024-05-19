@@ -19,7 +19,7 @@ predictor_puntos_faciales = dlib.shape_predictor(predictor_puntos_de_referencia)
 
 def clasificar(image):
     
-  print(image.shape)
+  # print(image.shape)
 
   image = cv2.resize(image, (500, 500)) 
 
@@ -47,7 +47,7 @@ def clasificar(image):
       flags=cv2.CASCADE_SCALE_IMAGE
       )
 
-  print("found {0} faces!".format(len(rostros)) )
+  # print("found {0} faces!".format(len(rostros)) )
 
   for (x,y,w,h) in rostros:
       # pintar rectangulo alrededor del rostro
@@ -178,41 +178,48 @@ def clasificar(image):
   for i in range(1):
     if similitud < 10:
       if angulo < 160:
-        print('forma cuadrada. Las líneas de la mandíbula son más angulares')
+        # print('forma cuadrada. Las líneas de la mandíbula son más angulares')
+        forma = "cuadrada"
         cv2.putText(imagen_landmarks,'cuadrada',tuple(x+izquierda),fontFace=cv2.FONT_HERSHEY_SIMPLEX,fontScale=1,color=(0,255,0), thickness=2)
         break
       else:
-        print('forma redonda. Las líneas de la mandíbula no son tan angulares')
+        # print('forma redonda. Las líneas de la mandíbula no son tan angulares')
+        forma = "redonda"
         cv2.putText(imagen_landmarks,'redonda',tuple(x+izquierda),fontFace=cv2.FONT_HERSHEY_SIMPLEX,fontScale=1,color=(0,255,0), thickness=2)
         break
     if linea3 > linea1:
       if angulo < 160:
         cv2.putText(imagen_landmarks,'triángulo',tuple(x+izquierda),fontFace=cv2.FONT_HERSHEY_SIMPLEX,fontScale=1,color=(0,255,0), thickness=2)
-        print('forma de triángulo. La frente es más ancha')
+        # print('forma de triángulo. La frente es más ancha')
+        forma = "triángulo"
         break
     if ovalsimilitud < 10:
       cv2.putText(imagen_landmarks,'diamante',tuple(x+izquierda),fontFace=cv2.FONT_HERSHEY_SIMPLEX,fontScale=1,color=(0,255,0), thickness=2)
-      print('forma de diamante. Las líneas 2 y 4 son similares, aunque L2 es ligeramente más grande')
+      # print('forma de diamante. Las líneas 2 y 4 son similares, aunque L2 es ligeramente más grande')
+      forma = "diamante"
       break
     if linea4 > linea2:
       if angulo < 160:
         cv2.putText(imagen_landmarks,'rectangular',tuple(x+izquierda),fontFace=cv2.FONT_HERSHEY_SIMPLEX,fontScale=1,color=(0,255,0), thickness=2)
-        print('forma rectangular. La longitud del rostro es la más grande y las líneas de la mandíbula son angulares')
+        # print('forma rectangular. La longitud del rostro es la más grande y las líneas de la mandíbula son angulares')
+        forma = "rectangular"
         break
       else:
         cv2.putText(imagen_landmarks,'alargada',tuple(x+izquierda),fontFace=cv2.FONT_HERSHEY_SIMPLEX,fontScale=1,color=(0,255,0), thickness=2)
-        print('forma alargada. La longitud del rostro es la más grande y las líneas de la mandíbula no son angulares')
+        # print('forma alargada. La longitud del rostro es la más grande y las líneas de la mandíbula no son angulares')
+        forma = "alargada"
         break
-    print("Error")
+    # print("Error")
+    forma = "Error"
 
-  return imagen_landmarks 
+  return imagen_landmarks, forma
 
 if "__main__" == __name__:
    
   ruta_imagen = "./rostros/rostro4.jpg"
   imagen = cv2.imread(ruta_imagen)
-  output = clasificar(imagen)
+  output, forma = clasificar(imagen)
   cv2.imshow('salida', output)
-
+  print(forma)
   cv2.waitKey(0)
   cv2.destroyAllWindows()

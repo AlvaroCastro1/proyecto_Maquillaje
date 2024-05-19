@@ -47,11 +47,12 @@ def obtener_color_dominante(imagen):
 # Ejemplo de uso de la función
 if __name__ == "__main__":
     # Cargar la imagen
-    image_path = "./rostros/rostro.jpg"
+    image_path = "./rostros/rostro3.jpg"
     imagen = cv2.imread(image_path)
 
     # Obtener la imagen con el color dominante
     imagen_color = obtener_color_dominante(imagen)
+    print(imagen_color.shape)
 
     cv2.imshow("Color Dominante", imagen_color)
     cv2.waitKey(0)
