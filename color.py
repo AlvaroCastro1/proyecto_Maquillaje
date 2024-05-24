@@ -11,6 +11,9 @@ def obtener_color_dominante(imagen):
     # Inicializar el detector de rostros de dlib
     detector = dlib.get_frontal_face_detector()
 
+    # Cargar el predictor de forma facial
+    predictor = dlib.shape_predictor("./modelos/shape_predictor_68_face_landmarks.dat")
+
     # Detectar rostros
     rostros = detector(imagen_rgb)
 
@@ -24,11 +27,19 @@ def obtener_color_dominante(imagen):
 
     # Iterar sobre los rostros detectados para obtener sus colores
     for rostro in rostros:
-        x, y, w, h = rostro.left(), rostro.top(), rostro.width(), rostro.height()
-        region_rostro = imagen_rgb[y:y + h, x:x + w]
+        # Predecir los puntos faciales
+        forma = predictor(imagen_rgb, rostro)
+
+        # Extraer la región de la cara sin cabello ni vello facial
+        puntos_facial = np.array([(forma.part(i).x, forma.part(i).y) for i in range(17, 68)])  # Puntos del rostro
+        mascara = np.zeros(imagen_rgb.shape[:2], dtype=np.uint8)
+        cv2.fillConvexPoly(mascara, puntos_facial, 255)
+
+        # Extraer la región del rostro usando la máscara
+        region_rostro = cv2.bitwise_and(imagen_rgb, imagen_rgb, mask=mascara)
         
         # Aplanar la región y añadir los colores
-        colores = region_rostro.reshape(-1, region_rostro.shape[-1])
+        colores = region_rostro[mascara == 255].reshape(-1, 3)
         colores_piel.extend(colores)
 
     # Calcular el color dominante entre los colores obtenidos
