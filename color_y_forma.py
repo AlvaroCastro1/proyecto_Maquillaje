@@ -29,9 +29,11 @@ class VideoCaptureApp(QtWidgets.QMainWindow):
         self.lb_color_piel = self.findChild(QtWidgets.QLabel, "lb_color_piel")
         self.lb_forma = self.findChild(QtWidgets.QLabel, "lb_forma")
         self.btn_salir = self.findChild(QtWidgets.QPushButton, "btn_salir")
+        self.btn_forma_aplicar = self.findChild(QtWidgets.QPushButton, "btn_forma_aplicar")
         
         # Configurar botones
         self.btn_salir.clicked.connect(self.close_application)
+        #self.btn_forma_aplicar.clicked.connect(self.aqui_va_la_accion)
 
         # Configurar temporizador para actualizar video
         self.cap = cv2.VideoCapture(0)
@@ -163,6 +165,9 @@ class VideoCaptureApp(QtWidgets.QMainWindow):
         return False
         
     def close_application(self):
+        from menu_inicial import MainApp
+        self.new_window = MainApp()
+        self.new_window.show()
         self.close()
 
     def closeEvent(self, event):
@@ -170,8 +175,9 @@ class VideoCaptureApp(QtWidgets.QMainWindow):
         self.cap.release()
         event.accept()
 
-# Ejecutar la aplicación
-app = QtWidgets.QApplication(sys.argv)
-window = VideoCaptureApp()
-window.show()
-sys.exit(app.exec())
+if __name__ == "__main__":
+    # Ejecutar la aplicación
+    app = QtWidgets.QApplication(sys.argv)
+    window = VideoCaptureApp()
+    window.show()
+    sys.exit(app.exec())

@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>VentanaPrincipal</class>
+ <widget class="QMainWindow" name="VentanaPrincipal">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>502</width>
+    <height>211</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <property name="layoutDirection">
+    <enum>Qt::LeftToRight</enum>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
+    <item>
+     <widget class="QFrame" name="principal">
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+      <property name="lineWidth">
+       <number>1</number>
+      </property>
+      <widget class="QFrame" name="panel_principal">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>501</width>
+         <height>211</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QWidget {
+    background: qlineargradient(
+        x1: 0, y1: 0, 
+        x2: 1, y2: 1, 
+		stop: 0		 #98FB98,    /* Amarillo*/
+        stop: 0.5	 #ADD8E6, 	/* Coral */
+        stop: 1		 #32CD32   	/* Rosa Suave */
+    );
+}
+
+
+QPushButton {
+    background-color: #98FB98;          /* Verde Pálido */
+    border: 2px solid #32CD32;          /* Borde Verde Lima */
+    padding: 6px 20px;                  /* Espaciado interno */
+    font-size: 12px;                    /* Tamaño de fuente */
+    border-radius: 5px;                 /* Bordes ligeramente redondeados */
+    color: #000000;                     /* Texto en blanco */
+}
+
+QPushButton:hover {
+    background-color: #3CB371;          /* Verde Mar Medio */
+    border: 2px solid #2E8B57;          /* Borde Verde Marino */
+    border-radius: 15px;                /* Bordes más redondeados al pasar el cursor */
+}
+
+QPushButton:pressed {
+    background-color: #98FB98;          /* Verde Pálido */
+    border: 2px solid #32CD32;          /* Borde Verde Lima */
+    padding-left: 15px;                 /* Desplazamiento al hacer clic */
+    padding-top: 15px;                  /* Desplazamiento al hacer clic */
+}
+</string>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <widget class="QPushButton" name="btn_color_forma">
+        <property name="geometry">
+         <rect>
+          <x>30</x>
+          <y>30</y>
+          <width>441</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true"/>
+        </property>
+        <property name="text">
+         <string>Forma y tono de color de piel</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="btn_maquillaje">
+        <property name="geometry">
+         <rect>
+          <x>30</x>
+          <y>90</y>
+          <width>441</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true"/>
+        </property>
+        <property name="text">
+         <string>Aplicar maquillaje</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="btn_filtro">
+        <property name="geometry">
+         <rect>
+          <x>30</x>
+          <y>150</y>
+          <width>441</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true"/>
+        </property>
+        <property name="text">
+         <string>Filtro de maquillaje</string>
+        </property>
+       </widget>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

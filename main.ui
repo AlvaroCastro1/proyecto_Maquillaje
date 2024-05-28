@@ -196,20 +196,40 @@ QPushButton:pressed {
          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Color de Piel&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
-       <widget class="QLabel" name="lb_forma">
+       <widget class="QPushButton" name="btn_forma_aplicar">
         <property name="geometry">
          <rect>
           <x>800</x>
-          <y>340</y>
-          <width>181</width>
-          <height>51</height>
+          <y>350</y>
+          <width>191</width>
+          <height>31</height>
          </rect>
         </property>
         <property name="styleSheet">
-         <string notr="true">    background-color: rgba(255, 255, 255, 0);  /* Blanco transparente */</string>
+         <string notr="true">QPushButton {
+    background-color: #FF69B4;          /* Color de fondo rosa chicle */
+    border: 2px solid #FF1493;          /* Borde sólido color rosa oscuro */
+    padding: 6px 20px;                  /* Espaciado interno */
+    font-size: 12px;                    /* Tamaño de fuente */
+    border-radius: 5px;                 /* Bordes iniciales ligeramente redondeados */
+}
+
+QPushButton:hover {
+    background-color: #FF1493;          /* Color de fondo al pasar el cursor */
+    border: 2px solid #FF69B4;          /* Borde al pasar el cursor */
+    border-radius: 15px;                /* Bordes redondeados al pasar el cursor */
+}
+
+QPushButton:pressed {
+    background-color: #FF69B4;          /* Color de fondo al hacer clic */
+    border: 2px solid #FF1493;          /* Borde al hacer clic */
+    padding-left: 15px;                 /* Desplazamiento al hacer clic */
+    padding-top: 15px;                  /* Desplazamiento al hacer clic */
+}
+</string>
         </property>
         <property name="text">
-         <string/>
+         <string>Forma de Aplicación</string>
         </property>
        </widget>
       </widget>
